@@ -33,7 +33,8 @@ export default defineNuxtConfig({
   // `headers`: de ahí el `as`.)
   routeRules: {
     '/datos/**': { headers: { 'cache-control': 'public, max-age=86400' } },
-    '/api/**': { headers: { 'cache-control': 'no-cache' } },
+    // La API es pública: yoiber.com la lee para su franja «Ahora mismo».
+    '/api/**': { headers: { 'cache-control': 'no-cache', 'access-control-allow-origin': '*' } },
     '/**': { headers: { 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'x-frame-options': 'SAMEORIGIN' } },
   } satisfies Record<string, { headers: Record<string, string> }> as Record<string, object>,
   typescript: { strict: true },
