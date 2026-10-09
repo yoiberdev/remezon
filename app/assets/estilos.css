@@ -1,0 +1,1037 @@
+/* Remezón. La escena va a pantalla completa y los paneles flotan encima, como los de un instrumento:
+   fondo casi negro, rayas finas, cifras en mono y el color reservado para la profundidad. */
+
+:root {
+  --fondo: #06080c;
+  --tinta: #eef1f5;
+  --tinta-2: #c9d0da;
+  --gris: #8b95a5;
+  --gris-2: #5d6675;
+  --linea: rgba(160, 180, 205, 0.14);
+  --linea-2: rgba(160, 180, 205, 0.26);
+  --panel: rgba(9, 12, 18, 0.8);
+  --superficial: #ff6a3d;
+  --intermedio: #ffd23f;
+  --profundo: #5ab0ff;
+  --vivo: #ff4d3d;
+  --letra: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --borde: 24px;
+  --ancho-panel: 340px;
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#__nuxt {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--tinta);
+  font-family: var(--letra);
+  font-size: 15px;
+  line-height: 1.4;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--intermedio);
+  outline-offset: 2px;
+}
+
+h1,
+h2,
+p,
+ol,
+ul {
+  margin: 0;
+}
+
+ol,
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+/* ---------- la escena ---------- */
+
+.lienzo {
+  position: fixed;
+  inset: 0;
+}
+
+.cargando {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font: 12px/1 var(--mono);
+  letter-spacing: 0.06em;
+  color: var(--gris);
+  pointer-events: none;
+  animation: latido 1.6s ease-in-out infinite;
+}
+
+/* Lo que se dibuja dentro de la escena (cientos <Html>). */
+.marca-km {
+  display: block;
+  translate: -62% 0;
+  font: 10px/1 var(--mono);
+  color: rgba(159, 179, 200, 0.62);
+  white-space: nowrap;
+}
+
+.ciudad {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 560;
+  color: var(--tinta);
+  text-shadow: 0 1px 3px #000, 0 0 8px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+}
+
+.ciudad i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--tinta);
+  box-shadow: 0 0 0 2px rgba(6, 8, 12, 0.7);
+}
+
+.rotulo-sismo {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-left: 16px;
+  translate: 0 -50%;
+  padding: 5px 9px;
+  background: rgba(6, 8, 12, 0.86);
+  border-left: 2px solid var(--tono);
+  font: 11px/1.2 var(--mono);
+  color: var(--tinta-2);
+  white-space: nowrap;
+}
+
+.rotulo-sismo b {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tono);
+}
+
+/* ---------- piezas comunes ---------- */
+
+.rotulo {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font: 500 10.5px/1.3 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gris);
+}
+
+.marca,
+.vistas,
+.panel,
+.sismograma,
+.leyenda,
+.leyenda-boton {
+  position: fixed;
+  z-index: 20;
+}
+
+.panel,
+.sismograma,
+.leyenda {
+  background: var(--panel);
+  border: 1px solid var(--linea);
+  border-radius: 6px;
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+}
+
+/* Los botones de dos o más opciones: el período, las vistas. */
+.periodos,
+.vistas {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--linea-2);
+  border-radius: 999px;
+  background: rgba(9, 12, 18, 0.7);
+}
+
+.periodos button,
+.vistas button {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 13px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tinta-2);
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+}
+
+.periodos button:hover,
+.vistas button:hover {
+  color: var(--tinta);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.periodos [aria-checked='true'],
+.vistas [aria-pressed='true'] {
+  background: var(--tinta);
+  color: var(--fondo);
+}
+
+.periodos [aria-checked='true']:hover,
+.vistas [aria-pressed='true']:hover {
+  background: var(--tinta);
+  color: var(--fondo);
+}
+
+.vistas kbd {
+  margin-right: 7px;
+  padding: 1px 4px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font: 9.5px/1.2 var(--mono);
+  opacity: 0.55;
+}
+
+@media (hover: none) {
+  .vistas kbd {
+    display: none;
+  }
+}
+
+/* ---------- la marca ---------- */
+
+.marca {
+  top: var(--borde);
+  left: var(--borde);
+  max-width: var(--ancho-panel);
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(6, 8, 12, 0.9), 0 0 18px rgba(6, 8, 12, 0.85);
+}
+
+.marca h1 {
+  font-size: 44px;
+  line-height: 0.95;
+  font-weight: 760;
+  letter-spacing: -0.035em;
+}
+
+.marca h1.remece {
+  animation: remece 0.9s cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+
+.marca-lema {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--tinta-2);
+}
+
+.en-vivo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font: 11px/1 var(--mono);
+  color: var(--gris);
+}
+
+.en-vivo i {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--vivo);
+}
+
+.en-vivo i::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 1px solid var(--vivo);
+  border-radius: 50%;
+  animation: onda 2s ease-out infinite;
+}
+
+.en-vivo.fallo i {
+  background: var(--gris-2);
+}
+
+.en-vivo.fallo i::after {
+  display: none;
+}
+
+/* ---------- las vistas ---------- */
+
+.vistas {
+  top: var(--borde);
+  right: var(--borde);
+}
+
+/* ---------- el panel ---------- */
+
+.panel {
+  top: 168px;
+  left: var(--borde);
+  bottom: var(--borde);
+  width: var(--ancho-panel);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px;
+}
+
+.panel .periodos {
+  align-self: flex-start;
+}
+
+.panel-nota {
+  padding: 14px 4px;
+  font-size: 14px;
+  color: var(--tinta-2);
+}
+
+.ficha {
+  display: grid;
+  gap: 10px;
+  padding: 14px 14px 12px;
+  border: 1px solid var(--linea);
+  border-top: 2px solid var(--tono);
+  border-radius: 4px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--tono) 9%, transparent), transparent 70%);
+}
+
+.ficha-cuerpo {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+}
+
+.ficha-texto {
+  min-width: 0;
+}
+
+.ficha-mag {
+  font: 500 60px/0.9 var(--mono);
+  letter-spacing: -0.04em;
+  color: var(--tono);
+}
+
+.ficha-mag small {
+  margin-right: 4px;
+  font-size: 18px;
+  letter-spacing: 0;
+  vertical-align: top;
+  color: var(--gris);
+}
+
+.ficha h2 {
+  margin: 10px 0 2px;
+  font-size: 19px;
+  font-weight: 620;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.ficha-region {
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--tinta-2);
+}
+
+.ficha-dato {
+  font-size: 13px;
+  color: var(--gris);
+}
+
+.ficha-dato + .ficha-dato {
+  margin-top: 3px;
+}
+
+.ficha-dato b {
+  font-family: var(--mono);
+  font-weight: 500;
+  color: var(--tinta);
+}
+
+.ficha-aviso {
+  padding: 8px 10px;
+  border-radius: 3px;
+  background: rgba(255, 210, 63, 0.08);
+  font-size: 12.5px;
+  color: var(--tinta-2);
+}
+
+.ficha-enlace {
+  justify-self: start;
+  font-size: 12.5px;
+  color: var(--gris);
+  text-decoration: none;
+  border-bottom: 1px solid var(--linea-2);
+}
+
+.ficha-enlace:hover {
+  color: var(--tinta);
+  border-color: var(--tinta);
+}
+
+/* La columna de 700 km. */
+.hondura {
+  position: relative;
+  width: 58px;
+  height: 150px;
+}
+
+.hondura-pozo {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.hondura-pozo i {
+  border-radius: 1px;
+}
+
+.hondura-pozo .t1 {
+  flex: 70;
+  background: color-mix(in srgb, var(--superficial) 30%, transparent);
+}
+
+.hondura-pozo .t2 {
+  flex: 230;
+  background: color-mix(in srgb, var(--intermedio) 22%, transparent);
+}
+
+.hondura-pozo .t3 {
+  flex: 400;
+  background: color-mix(in srgb, var(--profundo) 20%, transparent);
+}
+
+.hondura-marca {
+  position: absolute;
+  top: var(--en);
+  left: -3px;
+  width: 16px;
+  height: 2px;
+  margin-top: -1px;
+  background: var(--tono);
+  box-shadow: 0 0 8px var(--tono);
+}
+
+.hondura-marca b {
+  position: absolute;
+  left: 20px;
+  top: -7px;
+  font: 500 11px/1 var(--mono);
+  color: var(--tono);
+  white-space: nowrap;
+}
+
+.hondura-fondo {
+  position: absolute;
+  left: 15px;
+  bottom: -2px;
+  font: 9.5px/1 var(--mono);
+  color: var(--gris-2);
+}
+
+.hondura.compacto {
+  width: 6px;
+  height: 30px;
+}
+
+.hondura.compacto .hondura-pozo {
+  width: 6px;
+  gap: 0;
+}
+
+.hondura.compacto .hondura-marca {
+  left: -3px;
+  width: 12px;
+  box-shadow: none;
+}
+
+.panel-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 12px;
+  padding: 0 4px;
+  font-size: 12.5px;
+  color: var(--gris);
+}
+
+.panel-cabeza b {
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-weight: 500;
+  color: var(--tinta);
+}
+
+.orden {
+  display: flex;
+  gap: 10px;
+}
+
+.orden button {
+  font-size: 12px;
+  color: var(--gris);
+  border-bottom: 1px solid transparent;
+}
+
+.orden [aria-checked='true'] {
+  color: var(--tinta);
+  border-color: var(--tinta);
+}
+
+.desplegar {
+  display: none;
+}
+
+.lista {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: -4px -6px -6px;
+  padding: 0 4px 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--linea-2) transparent;
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: 40px 1fr 8px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px 8px 8px;
+  border-left: 2px solid transparent;
+  border-radius: 3px;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.fila:hover {
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.fila[aria-current] {
+  background: rgba(255, 255, 255, 0.075);
+  border-left-color: var(--tono);
+}
+
+.fila-mag {
+  font: 500 16px/1 var(--mono);
+  color: var(--tono);
+}
+
+.fila-texto {
+  display: grid;
+  min-width: 0;
+}
+
+.fila-texto b {
+  overflow: hidden;
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.fila-texto small {
+  overflow: hidden;
+  font-size: 12px;
+  color: var(--gris);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---------- el sismograma ---------- */
+
+.sismograma {
+  left: calc(var(--borde) * 2 + var(--ancho-panel));
+  right: var(--borde);
+  bottom: var(--borde);
+  padding: 10px 14px 8px;
+}
+
+.sismograma-nota {
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--gris-2);
+}
+
+.sismograma-papel {
+  position: relative;
+  margin-top: 6px;
+}
+
+.sismograma svg {
+  display: block;
+  overflow: visible;
+}
+
+.sismograma-rayas line {
+  stroke: var(--linea);
+}
+
+.sismograma-rayas line.fuerte {
+  stroke: var(--linea-2);
+}
+
+.sismograma-rayas text {
+  font: 9.5px var(--mono);
+  fill: var(--gris);
+}
+
+.sismograma-traza {
+  fill: none;
+  stroke: var(--tinta);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  opacity: 0.82;
+}
+
+.sismograma-elegido {
+  stroke-width: 1.5;
+  stroke-dasharray: 2 3;
+}
+
+.sismograma-puntos circle {
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+
+.sismograma-puntos circle:hover,
+.sismograma-puntos circle.activo {
+  opacity: 1;
+  stroke: var(--tinta);
+  stroke-width: 1.5;
+}
+
+.sismograma-ahora {
+  font: 9.5px var(--mono);
+  fill: var(--vivo);
+}
+
+/* ---------- la leyenda ---------- */
+
+.leyenda {
+  right: var(--borde);
+  bottom: calc(var(--borde) * 2 + 116px);
+  width: 300px;
+  display: grid;
+  gap: 14px;
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  padding: 14px 16px;
+  scrollbar-width: thin;
+}
+
+.leyenda-boton {
+  display: none;
+}
+
+.leyenda-fila {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+}
+
+.leyenda-fila .rotulo {
+  margin-bottom: 8px;
+}
+
+.tramos {
+  display: grid;
+  gap: 5px;
+}
+
+.tramos li {
+  display: grid;
+  grid-template-columns: 10px 1fr;
+  align-items: center;
+  column-gap: 8px;
+  font-size: 13px;
+}
+
+.tramos i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--tono);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--tono) 60%, transparent);
+}
+
+.tramos small {
+  grid-column: 2;
+  margin-top: -3px;
+  font: 10.5px var(--mono);
+  color: var(--gris);
+}
+
+.tamanos {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.tamanos li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font: 10.5px var(--mono);
+  color: var(--gris);
+}
+
+.tamanos i {
+  border-radius: 50%;
+  border: 1px solid var(--tinta-2);
+}
+
+.interruptor {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--linea);
+  font-size: 13.5px;
+  cursor: pointer;
+}
+
+.interruptor input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.interruptor small {
+  display: block;
+  font-size: 11.5px;
+  color: var(--gris);
+}
+
+.interruptor-pista {
+  position: relative;
+  width: 30px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--gris-2);
+  transition: background 0.2s;
+}
+
+.interruptor-pista::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--tinta);
+  transition: translate 0.2s;
+}
+
+.interruptor input:checked + .interruptor-pista {
+  background: var(--intermedio);
+}
+
+.interruptor input:checked + .interruptor-pista::after {
+  translate: 12px 0;
+  background: var(--fondo);
+}
+
+.interruptor input:focus-visible + .interruptor-pista {
+  outline: 2px solid var(--intermedio);
+  outline-offset: 2px;
+}
+
+.explica {
+  display: grid;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--linea);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--tinta-2);
+}
+
+.explica b {
+  color: var(--tinta);
+}
+
+.explica-chico {
+  font-size: 12px;
+  color: var(--gris);
+}
+
+.creditos {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--gris-2);
+}
+
+.creditos a {
+  color: var(--gris);
+}
+
+/* ---------- pantallas medianas ---------- */
+
+@media (max-width: 1180px) {
+  :root {
+    --ancho-panel: 310px;
+  }
+
+  .leyenda {
+    width: 270px;
+  }
+
+  .explica-chico,
+  .creditos {
+    display: none;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 761px) {
+  .explica {
+    display: none;
+  }
+
+  .leyenda {
+    bottom: calc(var(--borde) * 2 + 116px);
+  }
+}
+
+/* ---------- el celular ---------- */
+
+@media (max-width: 760px) {
+  :root {
+    --borde: 14px;
+  }
+
+  .marca h1 {
+    font-size: 30px;
+  }
+
+  .marca-lema {
+    margin-top: 4px;
+    font-size: 12.5px;
+    max-width: 210px;
+  }
+
+  .en-vivo {
+    margin-top: 7px;
+  }
+
+  .vistas {
+    top: 118px;
+    left: var(--borde);
+    right: auto;
+  }
+
+  .en-vivo-cuando {
+    display: none;
+  }
+
+  .vistas button {
+    padding: 6px 10px;
+    font-size: 12.5px;
+  }
+
+  .panel {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-height: 48vh;
+    gap: 10px;
+    padding: 10px 12px 14px;
+    border-radius: 12px 12px 0 0;
+    border-bottom: 0;
+  }
+
+  .panel.abierto {
+    max-height: 78vh;
+  }
+
+  .ficha {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  .ficha-mag {
+    font-size: 40px;
+  }
+
+  .ficha h2 {
+    margin: 6px 0 4px;
+    font-size: 16px;
+  }
+
+  .hondura {
+    height: 104px;
+  }
+
+  .ficha-enlace,
+  .ficha-dato + .ficha-dato + .ficha-dato {
+    display: none;
+  }
+
+  .panel.abierto .ficha-enlace {
+    display: initial;
+  }
+
+  .panel-cabeza {
+    display: none;
+  }
+
+  .panel.abierto .panel-cabeza {
+    display: flex;
+  }
+
+  .desplegar {
+    display: block;
+    padding: 8px;
+    border: 1px solid var(--linea-2);
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--tinta-2);
+  }
+
+  .lista {
+    display: none;
+  }
+
+  .panel.abierto .lista {
+    display: block;
+  }
+
+  .sismograma {
+    display: none;
+  }
+
+  .leyenda-boton {
+    display: block;
+    top: var(--borde);
+    right: var(--borde);
+    padding: 7px 12px;
+    border: 1px solid var(--linea-2);
+    border-radius: 999px;
+    background: rgba(9, 12, 18, 0.7);
+    font-size: 12.5px;
+  }
+
+  .leyenda {
+    top: 62px;
+    left: var(--borde);
+    right: var(--borde);
+    bottom: auto;
+    width: auto;
+    max-height: calc(100vh - 80px);
+    display: none;
+    z-index: 30;
+    background: rgba(9, 12, 18, 0.94);
+  }
+
+  .leyenda.abierta {
+    display: grid;
+  }
+
+  .explica-chico,
+  .creditos {
+    display: block;
+  }
+}
+
+/* ---------- movimiento ---------- */
+
+@keyframes onda {
+  from {
+    opacity: 0.9;
+    scale: 0.5;
+  }
+  to {
+    opacity: 0;
+    scale: 1.8;
+  }
+}
+
+@keyframes latido {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@keyframes remece {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  10% {
+    translate: -4px 1px;
+  }
+  22% {
+    translate: 4px -1px;
+  }
+  34% {
+    translate: -3px 0;
+  }
+  48% {
+    translate: 2px 1px;
+  }
+  62% {
+    translate: -1px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
