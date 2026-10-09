@@ -7,7 +7,8 @@ import { traducirLugar } from './lugares'
 //    país, desde magnitud 3 más o menos, con la referencia en español y la intensidad. Su página de
 //    «sismos reportados» lee una lista por año (ultimosismo.igp.gob.pe/api/ultimo-sismo/ajaxb/AAAA);
 //    se pide esa misma lista y se guarda tres minutos, así que el IGP recibe a lo más una consulta
-//    cada tres minutos por año, venga quien venga.
+//    cada tres minutos por año, venga quien venga. Una lista vencida no se sirve: se pide de nuevo y,
+//    si el IGP no contesta, entra el USGS.
 // 2. El USGS, si el IGP no responde: su catálogo (FDSN) publica en esta zona sobre todo los de
 //    magnitud 4 o más.
 
@@ -58,7 +59,7 @@ export const lugarIGP = (r: string | null) =>
 const listaDelAnio = defineCachedFunction(
   (anio: number) =>
     $fetch<ReporteIGP[]>(`https://ultimosismo.igp.gob.pe/api/ultimo-sismo/ajaxb/${anio}`, { headers: AGENTE, timeout: 15_000 }),
-  { maxAge: 180, swr: true, name: 'igp', getKey: (anio: number) => String(anio) },
+  { maxAge: 180, swr: false, name: 'igp', getKey: (anio: number) => String(anio) },
 )
 
 export async function sismosIGP(desde: number): Promise<SismoVivo[]> {

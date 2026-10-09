@@ -2,7 +2,9 @@ import { sismosIGP, sismosUSGS, type SismoVivo } from '../utils/fuentes'
 
 // GET /api/sismos?periodo=dia|semana|mes
 // Los sismos de la zona en ese período, del IGP y, si el IGP no responde, del USGS (server/utils/
-// fuentes.ts). La respuesta se guarda un minuto.
+// fuentes.ts). La respuesta se guarda un minuto. Vencida, no se sirve mientras se arma la nueva (eso
+// haría que el primero en llegar después de un rato sin visitas viera sismos de hace horas): se espera
+// la nueva, que casi siempre sale de la lista del IGP ya guardada.
 
 const DIAS = { dia: 1, semana: 7, mes: 30 } as const
 type Periodo = keyof typeof DIAS
@@ -23,5 +25,5 @@ export default defineCachedEventHandler(
     }
     return { periodo, fuente, actualizado: Date.now(), sismos }
   },
-  { maxAge: 60, swr: true, getKey: (event) => `sismos-${String(getQuery(event).periodo ?? 'semana')}` },
+  { maxAge: 60, swr: false, getKey: (event) => `sismos-${String(getQuery(event).periodo ?? 'semana')}` },
 )
