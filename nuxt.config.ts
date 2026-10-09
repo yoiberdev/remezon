@@ -29,10 +29,12 @@ export default defineNuxtConfig({
     },
   },
   // Los datos fijos cambian poco (scripts/datos.py); la API ya se guarda un minuto en el servidor.
+  // (Nitro aplica estas cabeceras, pero los tipos de reemplazo que Nuxt 4.5 usa aquí no conocen
+  // `headers`: de ahí el `as`.)
   routeRules: {
     '/datos/**': { headers: { 'cache-control': 'public, max-age=86400' } },
     '/api/**': { headers: { 'cache-control': 'no-cache' } },
     '/**': { headers: { 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'x-frame-options': 'SAMEORIGIN' } },
-  },
+  } satisfies Record<string, { headers: Record<string, string> }> as Record<string, object>,
   typescript: { strict: true },
 })
