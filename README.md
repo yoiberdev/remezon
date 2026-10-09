@@ -68,7 +68,7 @@ scripts/datos.py       baja el relieve y el catálogo histórico
 
 ## Correrlo
 
-Con Node 22 o más:
+Con Node 24 o más:
 
 ```bash
 npm install
