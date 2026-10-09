@@ -4,9 +4,9 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   modules: ['@tresjs/nuxt'],
   css: [
-    '@fontsource-variable/bricolage-grotesque',
-    '@fontsource/ibm-plex-mono/400.css',
-    '@fontsource/ibm-plex-mono/500.css',
+    '@fontsource-variable/archivo/wdth.css',
+    '@fontsource/spectral/400-italic.css',
+    '@fontsource/spectral/500-italic.css',
     '~/assets/estilos.css',
   ],
   app: {
@@ -15,7 +15,7 @@ export default defineNuxtConfig({
       title: 'Remezón · los sismos del Perú en vivo',
       meta: [
         { name: 'description', content: 'Los sismos del Perú en vivo y en 3D, cada uno a su profundidad real: la placa de Nazca hundiéndose bajo el continente, dibujada por medio siglo de sismos.' },
-        { name: 'theme-color', content: '#06080c' },
+        { name: 'theme-color', content: '#f4f3ee' },
         { property: 'og:title', content: 'Remezón · los sismos del Perú en vivo' },
         { property: 'og:description', content: 'Cada sismo a su profundidad real, sobre el relieve del Perú y el fondo del mar.' },
         { property: 'og:type', content: 'website' },

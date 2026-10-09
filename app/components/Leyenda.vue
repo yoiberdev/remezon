@@ -1,6 +1,7 @@
 <script setup lang="ts">
-// LA LEYENDA: los colores por profundidad, el tamaño por magnitud, el interruptor del medio siglo de
-// sismos y la explicación de lo que se está mirando. En el celular se abre con un botón.
+// LA LEYENDA, en su recuadro como en una carta: los colores por profundidad (con los cortes del IGP),
+// el tamaño por magnitud, el interruptor del medio siglo de sismos, la nota que explica lo que se
+// mira, y la flecha del norte con la escala gráfica. En el celular se abre con un botón.
 
 const { conHistoria } = useSismos()
 const historicos = useHistoricos()
@@ -9,9 +10,9 @@ const abierta = ref(false)
 const cifra = new Intl.NumberFormat('es-PE')
 
 const TRAMOS = [
-  ['superficial', 'Superficial', 'hasta 70 km'],
-  ['intermedio', 'Intermedio', '70 a 300 km'],
-  ['profundo', 'Profundo', 'más de 300 km'],
+  ['superficial', 'Superficial', `hasta ${FRONTERAS.intermedio} km`],
+  ['intermedio', 'Intermedio', `${FRONTERAS.intermedio} a ${FRONTERAS.profundo} km`],
+  ['profundo', 'Profundo', `más de ${FRONTERAS.profundo} km`],
 ] as const
 const MAGNITUDES = [4, 5, 6, 7].map((m) => ({ m, r: Math.round(radioMagnitud(m) * 70 * 10) / 10 }))
 </script>
@@ -20,7 +21,8 @@ const MAGNITUDES = [4, 5, 6, 7].map((m) => ({ m, r: Math.round(radioMagnitud(m) 
   <button class="leyenda-boton" :aria-expanded="abierta" aria-controls="leyenda" @click="abierta = !abierta">
     {{ abierta ? 'Cerrar' : '¿Qué estoy viendo?' }}
   </button>
-  <aside id="leyenda" class="leyenda" :class="{ abierta }" aria-label="Leyenda">
+  <aside id="leyenda" class="leyenda" :class="{ abierta }" aria-labelledby="leyenda-titulo">
+    <h2 id="leyenda-titulo" class="leyenda-titulo">Leyenda</h2>
     <div class="leyenda-fila">
       <div>
         <p class="rotulo">Profundidad</p>
@@ -64,6 +66,8 @@ const MAGNITUDES = [4, 5, 6, 7].map((m) => ({ m, r: Math.round(radioMagnitud(m) 
         La profundidad de los sismos es la real.
       </p>
     </div>
+
+    <Brujula />
 
     <p class="creditos">
       Sismos en vivo: <a href="https://ultimosismo.igp.gob.pe/" target="_blank" rel="noopener">IGP</a> (y el USGS

@@ -1,8 +1,9 @@
 // Colores, tamaños y textos que comparten la escena y los paneles.
 
-/** Por profundidad, como en los mapas sísmicos: superficial, intermedio y profundo. */
-export const COLORES = { superficial: '#ff6a3d', intermedio: '#ffd23f', profundo: '#5ab0ff' } as const
-export const FRONTERAS = { intermedio: 70, profundo: 300 } as const
+/** Por profundidad, con los cortes que usa el IGP: superficial hasta 60 km, intermedio hasta 300 y
+ *  profundo más abajo. Rojo, verde y azul, tintas de imprenta que se leen sobre el papel de la carta. */
+export const COLORES = { superficial: '#d7301f', intermedio: '#1a9850', profundo: '#2166ac' } as const
+export const FRONTERAS = { intermedio: 60, profundo: 300 } as const
 
 export type TipoProfundidad = keyof typeof COLORES
 

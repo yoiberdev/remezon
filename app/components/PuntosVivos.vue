@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-  AdditiveBlending,
   BufferGeometry,
   Color,
   Float32BufferAttribute,
@@ -38,9 +37,9 @@ const mano = (si: boolean) => (document.body.style.cursor = si ? 'pointer' : '')
 
 const esfera = new SphereGeometry(1, 16, 12)
 const material = new MeshBasicMaterial({ toneMapped: false, depthTest: false })
-const halo = new MeshBasicMaterial({ transparent: true, opacity: 0.35, blending: AdditiveBlending, depthWrite: false, depthTest: false, toneMapped: false })
-const lineas = new LineBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.32, depthTest: false })
-const aro = new Mesh(new RingGeometry(0.2, 0.25, 48), new MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.9, side: DoubleSide, depthWrite: false }))
+const halo = new MeshBasicMaterial({ transparent: true, opacity: 0.22, depthWrite: false, depthTest: false, toneMapped: false })
+const lineas = new LineBasicMaterial({ color: '#1b1d1f', transparent: true, opacity: 0.5, depthTest: false })
+const aro = new Mesh(new RingGeometry(0.2, 0.25, 48), new MeshBasicMaterial({ color: '#1b1d1f', transparent: true, opacity: 0.85, side: DoubleSide, depthWrite: false }))
 aro.rotation.x = -Math.PI / 2
 aro.renderOrder = 5
 

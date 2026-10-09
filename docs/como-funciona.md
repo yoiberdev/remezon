@@ -57,7 +57,9 @@ con un margen. Una unidad de la escena son 100 km, el eje x apunta al este, el z
 arriba. Un sismo a 300 km de profundidad queda en y = −3.
 
 El relieve (`Relieve.vue`) es una malla de 301 × 391 vértices, uno cada 0.05° (unos 5.5 km), con el
-color por altura: del azul oscuro de la fosa al blanco de los nevados. Las montañas van doce veces más
+color por altura, con las tintas hipsométricas de un atlas: azules que se oscurecen hacia la fosa y, en
+tierra, del verde de la costa y la selva al ocre y el pardo de la sierra, hasta el blanco de los
+nevados. Las montañas van doce veces más
 altas que en la realidad y el fondo del mar solo al doble. Con doce veces, la fosa frente a la costa
 bajaría a 84 km en la escala de la caja y quedaría por debajo de los sismos de la costa. La malla deja
 pasar un poco de luz, así que desde arriba se adivinan los sismos de debajo.

@@ -7,18 +7,23 @@ import { altoMapa, anchoMapa, sobreTierra } from '#shared/zona'
 // (shared/zona.ts). Se ve por los dos lados y deja pasar un poco de luz: desde abajo se mira la placa
 // a través del suelo, y desde arriba se adivinan los sismos de medio siglo.
 
-// Los colores por altura, en metros: del fondo de la fosa a la nieve de los nevados.
+// Las tintas hipsométricas de un atlas, en metros: azules que se oscurecen hacia la fosa, y en
+// tierra del verde de la costa y la selva al amarillo, el ocre y el pardo de la sierra, hasta el
+// blanco de los nevados.
 const TRAMOS: [number, string][] = [
-  [-7000, '#05131c'],
-  [-3000, '#0b2c3c'],
-  [-200, '#16485a'],
-  [0, '#2f6f78'],
-  [1, '#3a4a2c'],
-  [400, '#465833'],
-  [1500, '#6f6a45'],
-  [3000, '#9a8564'],
-  [4300, '#c3b394'],
-  [5200, '#eeeae1'],
+  [-7000, '#3b6894'],
+  [-4000, '#5d8dba'],
+  [-1500, '#8db4d4'],
+  [-200, '#b8d3e5'],
+  [0, '#d4e6ef'],
+  [1, '#a6c78c'],
+  [400, '#c4d99a'],
+  [1200, '#e8dfa2'],
+  [2200, '#e1be85'],
+  [3200, '#c79566'],
+  [4200, '#a7775b'],
+  [4900, '#cdc4bc'],
+  [5600, '#ffffff'],
 ]
 const colores = TRAMOS.map(([h, c]) => [h, new Color(c)] as const)
 
@@ -56,7 +61,7 @@ onMounted(async () => {
   }
   geo.setAttribute('color', new BufferAttribute(tintas, 3))
   geo.computeVertexNormals()
-  const material = new MeshStandardMaterial({ vertexColors: true, roughness: 0.94, metalness: 0, side: DoubleSide, transparent: true, opacity: 0.88 })
+  const material = new MeshStandardMaterial({ vertexColors: true, roughness: 1, metalness: 0, side: DoubleSide, transparent: true, opacity: 0.9 })
   malla.value = new Mesh(geo, material)
   listo.value = true
 })

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { TresCanvas } from '@tresjs/core'
 import { CameraControls } from '@tresjs/cientos'
-import { ACESFilmicToneMapping } from 'three'
+import { NoToneMapping, Vector3 } from 'three'
 import { bajoTierra, proyectar } from '#shared/zona'
 
 // LA ESCENA: el relieve, la caja de profundidad, medio siglo de sismos y los del período. La cámara
@@ -39,6 +39,26 @@ function ir(pos: V3, mira: V3, suave = !quieto) {
   return controles.value?.instance?.setLookAt(...lejos, ...mira, suave)
 }
 
+// LA BRÚJULA Y LA ESCALA de la leyenda: hacia dónde queda el norte en la pantalla, y cuántos
+// píxeles son 100 km a la altura del punto que mira la cámara (solo vale mirando desde arriba).
+const brujula = useState('brujula', () => ({ rumbo: 0, pxPor100km: 0, planta: true }))
+const camPos = new Vector3()
+const camMira = new Vector3()
+let pendiente = 0
+function medir(c: { getPosition: (v: Vector3) => Vector3; getTarget: (v: Vector3) => Vector3 }) {
+  cancelAnimationFrame(pendiente)
+  pendiente = requestAnimationFrame(() => {
+    c.getPosition(camPos)
+    c.getTarget(camMira)
+    const dir = camMira.clone().sub(camPos)
+    const d = dir.length()
+    const rumbo = (Math.atan2(dir.x, -dir.z) * 180) / Math.PI
+    const inclinacion = Math.asin(Math.min(1, -dir.y / d))
+    const alto = 2 * d * Math.tan((24 / 2) * (Math.PI / 180))
+    brujula.value = { rumbo: -rumbo, pxPor100km: innerHeight / alto, planta: inclinacion > 1.05 }
+  })
+}
+
 // La entrada: de lejos y desde arriba hasta la vista de costado.
 const stop = watch(
   () => controles.value?.instance,
@@ -71,12 +91,12 @@ watch(seleccionado, (id) => {
 </script>
 
 <template>
-  <TresCanvas clear-color="#06080c" :tone-mapping="ACESFilmicToneMapping" :dpr="[1, 2]" antialias>
+  <TresCanvas clear-color="#f5f5f1" :tone-mapping="NoToneMapping" :dpr="[1, 2]" antialias>
     <TresPerspectiveCamera :position="VISTAS.tres!.pos" :fov="24" :near="0.1" :far="400" />
-    <CameraControls ref="controles" make-default :min-distance="4" :max-distance="95" :smooth-time="0.7" />
-    <TresHemisphereLight :args="['#d6e6ff', '#2b2016', 1.15]" />
-    <TresDirectionalLight :position="[-9, 12, -7]" :intensity="2.6" />
-    <TresDirectionalLight :position="[10, 5, 9]" :intensity="0.5" color="#ffd9b0" />
+    <CameraControls ref="controles" make-default :min-distance="4" :max-distance="95" :smooth-time="0.7" @change="medir" />
+    <!-- La luz de un sombreado de relieve: desde el noroeste, como en las cartas. -->
+    <TresHemisphereLight :args="['#ffffff', '#cfc9bd', 1.6]" />
+    <TresDirectionalLight :position="[-12, 14, -10]" :intensity="1.9" />
     <Encuadre />
     <Relieve />
     <Caja />

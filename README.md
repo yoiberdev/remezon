@@ -10,8 +10,14 @@ reportes del IGP (Instituto Geofísico del Perú) y la página los vuelve a pedi
 ## Qué se ve
 
 Debajo del relieve del Perú hay una caja de 700 km de hondo. Cada punto es un sismo puesto en su
-hipocentro, el punto donde se rompió la roca. El color dice a qué profundidad: naranja hasta 70 km,
-amarillo hasta 300 y azul más abajo. El tamaño crece con la magnitud.
+hipocentro, el punto donde se rompió la roca. El color dice a qué profundidad: rojo hasta 60 km,
+verde hasta 300 y azul más abajo, con los mismos cortes que usa el IGP. El tamaño crece con la
+magnitud.
+
+La página está armada como una carta geológica: el marco graduado en blanco y negro, la cartela con
+el título, la leyenda en su recuadro, el relieve con las tintas de un atlas y la profundidad de cada
+sismo dibujada como una columna estratigráfica. En la vista Mapa aparece la escala gráfica, y la
+flecha del norte gira con la cámara.
 
 Los sismos del período elegido (24 horas, 7 días o 30 días) van más grandes, con una línea que baja
 desde el epicentro, y se ven a través del suelo. Detrás quedan los 5 937 sismos de magnitud 4.5 o más

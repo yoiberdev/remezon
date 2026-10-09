@@ -1,5 +1,6 @@
 <script setup lang="ts">
-// Remezón: la escena 3D a pantalla completa y los paneles encima.
+// Remezón: la escena 3D a pantalla completa y los paneles encima, armados como una carta: el marco
+// graduado alrededor de la hoja, la cartela con el título, el registro, la leyenda y el perfil.
 
 const { status, error } = usePedirSismos()
 useRelojAhora()
@@ -51,11 +52,12 @@ onBeforeUnmount(() => removeEventListener('keydown', tecla))
         <Escena />
       </ClientOnly>
     </div>
+    <div class="marco" aria-hidden="true"><i class="marco-n" /><i class="marco-s" /><i class="marco-e" /><i class="marco-o" /></div>
     <p v-if="!listo" class="cargando" role="status">Levantando el relieve del Perú…</p>
 
     <header class="marca">
       <h1 :class="{ remece }">Remezón</h1>
-      <p class="marca-lema">Los sismos del Perú, en vivo y a su profundidad real.</p>
+      <p class="marca-lema">Carta sísmica del Perú, con los sismos en vivo y a su profundidad real</p>
       <p class="en-vivo" :class="{ fallo: error }">
         <i aria-hidden="true" />
         <span v-if="error">Sin conexión, reintentando</span>
